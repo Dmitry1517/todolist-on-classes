@@ -8,18 +8,18 @@
 /* eslint-disable import/no-unresolved */
 /* eslint-disable react/sort-comp */
 /* eslint-disable react/destructuring-assignment */
-import React, { Component } from 'react';
-import PropTypes from 'prop-types';
-import { formatDistanceToNow } from 'https://unpkg.com/date-fns/formatDistanceToNow.mjs';
+import React, { Component } from "react";
+import PropTypes from "prop-types";
+// import { formatDistanceToNow } from 'https://unpkg.com/date-fns/formatDistanceToNow.mjs';
 
 export default class Task extends Component {
   state = {
-    label: this.props.labelText,
+    label: this.props.labelText
   };
 
   onLabelChange = (event) => {
     this.setState({
-      label: event.target.value,
+      label: event.target.value
     });
   };
 
@@ -39,13 +39,13 @@ export default class Task extends Component {
       checked,
       editing,
       onChecked,
-      onEditing,
+      onEditing
     } = this.props;
     const { label } = this.state;
 
-    let classNames = '';
-    if (checked) classNames = 'completed';
-    if (editing) classNames = 'editing';
+    let classNames = "";
+    if (checked) classNames = "completed";
+    if (editing) classNames = "editing";
 
     const result = formatDistanceToNow(date, { includeSeconds: true });
 
@@ -96,5 +96,5 @@ Task.propTypes = {
   editingChange: PropTypes.func,
   checked: PropTypes.bool,
   editing: PropTypes.bool,
-  date: PropTypes.object,
+  date: PropTypes.object
 };
