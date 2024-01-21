@@ -8,92 +8,71 @@
 /* eslint-disable import/no-unresolved */
 /* eslint-disable react/sort-comp */
 /* eslint-disable react/destructuring-assignment */
-import React, { Component } from "react";
+import React, { useState, useContext } from "react";
 import PropTypes from "prop-types";
 import { formatDistanceToNow } from "date-fns";
+import { Context } from "./context";
 
-export default class Task extends Component {
-  state = {
-    label: this.props.labelText
+export default function Task({ labelText, id, date, checked, editing }) {
+  const [label, setLabel] = useState(labelText);
+  const { deleteItem, checkItem, editItem, editingChange } =
+    useContext(Context);
+
+  const onLabelChange = (event) => {
+    setLabel(event.target.value);
   };
 
-  onLabelChange = (event) => {
-    this.setState({
-      label: event.target.value
-    });
-  };
-
-  onSubmit = (event) => {
-    const { editingChange, id } = this.props;
-    const { label } = this.state;
+  const onSubmit = (event) => {
     event.preventDefault();
     editingChange(id, label);
   };
 
-  render() {
-    const {
-      id,
-      date,
-      labelText,
-      onDeleted,
-      checked,
-      editing,
-      onChecked,
-      onEditing
-    } = this.props;
-    const { label } = this.state;
+  let classNames = "";
+  if (checked) classNames = "completed";
+  if (editing) classNames = "editing";
 
-    let classNames = "";
-    if (checked) classNames = "completed";
-    if (editing) classNames = "editing";
+  const result = formatDistanceToNow(date, { includeSeconds: true });
 
-    const result = formatDistanceToNow(date, { includeSeconds: true });
-
-    return (
-      <li className={classNames}>
-        <div className="view">
-          <input
-            id={id}
-            className="toggle"
-            type="checkbox"
-            checked={checked}
-            onChange={onChecked}
-          />
-          <label htmlFor={id}>
-            <span className="description">{labelText}</span>
-            <span className="created">created {result} ago</span>
-          </label>
-          <button
-            type="button"
-            className="icon icon-edit"
-            onClick={onEditing}
-          />
-          <button
-            type="button"
-            className="icon icon-destroy"
-            onClick={onDeleted}
-          />
-        </div>
-        <form onSubmit={this.onSubmit}>
-          <input
-            type="text"
-            className="edit"
-            onChange={(event) => this.onLabelChange(event)}
-            value={label}
-          />
-        </form>
-      </li>
-    );
-  }
+  return (
+    <li className={classNames}>
+      <div className="view">
+        <input
+          id={id}
+          className="toggle"
+          type="checkbox"
+          checked={checked}
+          onChange={() => checkItem(id)}
+        />
+        <label htmlFor={id}>
+          <span className="description">{labelText}</span>
+          <span className="created">created {result} ago</span>
+        </label>
+        <button
+          type="button"
+          className="icon icon-edit"
+          onClick={() => editItem(id)}
+        />
+        <button
+          type="button"
+          className="icon icon-destroy"
+          onClick={() => deleteItem(id)}
+        />
+      </div>
+      <form onSubmit={onSubmit}>
+        <input
+          type="text"
+          className="edit"
+          onChange={(event) => onLabelChange(event)}
+          value={label}
+        />
+      </form>
+    </li>
+  );
 }
 
 Task.propTypes = {
   id: PropTypes.number,
   labelText: PropTypes.string,
-  onDeleted: PropTypes.func,
-  onChecked: PropTypes.func,
-  onEditing: PropTypes.func,
-  editingChange: PropTypes.func,
   checked: PropTypes.bool,
   editing: PropTypes.bool,
   date: PropTypes.object

@@ -1,47 +1,37 @@
+/* eslint-disable react/no-unused-prop-types */
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable react/state-in-constructor */
 /* eslint-disable react/require-default-props */
 /* eslint-disable no-undef */
 /* eslint-disable react/sort-comp */
-import React, { Component } from "react";
+import React, { useState } from "react";
 import PropTypes from "prop-types";
 
-export default class NewTaskForm extends Component {
-  state = {
-    label: ""
+export default function NewTaskForm({ addItem, placeholder }) {
+  const [label, setLabel] = useState("");
+
+  const onLabelChange = (event) => {
+    setLabel(event.target.value);
   };
 
-  onLabelChange = (event) => {
-    this.setState({
-      label: event.target.value
-    });
-  };
-
-  onSubmit = (event) => {
-    const { addItem } = this.props;
-    const { label } = this.state;
+  const onSubmit = (event) => {
     event.preventDefault();
     addItem(label);
-    this.setState({
-      label: ""
-    });
+
+    setLabel("");
   };
 
-  render() {
-    const { placeholder } = this.props;
-    const { label } = this.state;
-    return (
-      <form onSubmit={this.onSubmit}>
-        <input
-          type="text"
-          className="new-todo"
-          placeholder={placeholder}
-          onChange={(event) => this.onLabelChange(event)}
-          value={label}
-        />
-      </form>
-    );
-  }
+  return (
+    <form onSubmit={onSubmit}>
+      <input
+        type="text"
+        className="new-todo"
+        placeholder={placeholder}
+        onChange={(event) => onLabelChange(event)}
+        value={label}
+      />
+    </form>
+  );
 }
 
 NewTaskForm.propTypes = {

@@ -8,13 +8,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import Task from "./task";
 
-const TaskList = ({
-  todos,
-  onDeleted,
-  onChecked,
-  onEditing,
-  editingChange
-}) => {
+const TaskList = ({ todos }) => {
   const elements = todos.map((item) => (
     <Task
       id={item.id}
@@ -23,20 +17,12 @@ const TaskList = ({
       labelText={item.label}
       checked={item.checked}
       editing={item.editing}
-      onDeleted={() => onDeleted(item.id)}
-      onChecked={() => onChecked(item.id)}
-      onEditing={() => onEditing(item.id)}
-      editingChange={editingChange}
     />
   ));
   return <ul className="todo-list">{elements}</ul>;
 };
 
 TaskList.propTypes = {
-  editingChange: PropTypes.func,
-  onDeleted: PropTypes.func,
-  onChecked: PropTypes.func,
-  onEditing: PropTypes.func,
   todos: PropTypes.array
 };
 

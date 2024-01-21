@@ -1,3 +1,5 @@
+/* eslint-disable react/jsx-no-constructed-context-values */
+/* eslint-disable no-console */
 /* eslint-disable react/state-in-constructor */
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable consistent-return */
@@ -6,158 +8,120 @@
 /* eslint-disable no-undef */
 /* eslint-disable import/extensions */
 /* eslint-disable import/no-unresolved */
-import React, { Component } from 'react';
-import NewTaskForm from './new-task-form';
-import TaskList from './task-list';
-import Footer from './footer';
+import React, { useState } from "react";
+import NewTaskForm from "./new-task-form";
+import TaskList from "./task-list";
+import Footer from "./footer";
+import { Context } from "./context";
 
-import '../style/index.css';
+import "../style/index.css";
 
-export default class App extends Component {
-  state = {
-    todoData: [],
-    filter: 'All',
-  };
+export default function App() {
+  const [todoData, setTodoData] = useState([]);
+  const [filter, setFilter] = useState("All");
 
-  maxId = 0;
-
-  onItemAdded = (text) => {
+  const onItemAdded = (text) => {
     const newItem = {
-      id: this.maxId++,
+      id: todoData.length + 1,
       label: text,
       checked: false,
       editing: false,
-      date: new Date(),
+      date: new Date()
     };
+    setTodoData((prevState) => [...prevState, newItem]);
+  };
 
-    this.setState(({ todoData }) => {
-      const newArr = [...todoData, newItem];
-      return {
-        todoData: newArr,
-      };
+  const deleteItem = (id) => {
+    setTodoData((prevState) => {
+      const idx = prevState.findIndex((el) => el.id === id);
+      return [...prevState.slice(0, idx), ...prevState.slice(idx + 1)];
     });
   };
 
-  deleteItem = (id) => {
-    this.setState(({ todoData }) => {
-      const idx = todoData.findIndex((el) => el.id === id);
-      const resArr = [...todoData.slice(0, idx), ...todoData.slice(idx + 1)];
+  const checkItem = (id) => {
+    setTodoData((prevState) => {
+      const idx = prevState.findIndex((el) => el.id === id);
 
-      return {
-        todoData: resArr,
-      };
+      return [
+        ...prevState.slice(0, idx),
+        { ...prevState[idx], checked: !prevState[idx].checked },
+        ...prevState.slice(idx + 1)
+      ];
     });
   };
 
-  checkItem = (id) => {
-    this.setState(({ todoData }) => {
-      const idx = todoData.findIndex((el) => el.id === id);
-      if (todoData[idx].checked) {
-        return {
-          todoData: [
-            ...todoData.slice(0, idx),
-            { ...todoData[idx], checked: false },
-            ...todoData.slice(idx + 1),
-          ],
-        };
-      }
-      return {
-        todoData: [
-          ...todoData.slice(0, idx),
-          { ...todoData[idx], checked: true },
-          ...todoData.slice(idx + 1),
-        ],
-      };
-    });
-  };
-
-  editItem = (id) => {
-    this.setState(({ todoData }) => {
-      const idx = todoData.findIndex((el) => el.id === id);
-      if (!todoData[idx].editing) {
-        return {
-          todoData: [
-            ...todoData.slice(0, idx),
-            { ...todoData[idx], editing: true },
-            ...todoData.slice(idx + 1),
-          ],
-        };
+  const editItem = (id) => {
+    setTodoData((prevState) => {
+      const idx = prevState.findIndex((el) => el.id === id);
+      if (!prevState[idx].editing) {
+        return [
+          ...prevState.slice(0, idx),
+          { ...prevState[idx], editing: true },
+          ...prevState.slice(idx + 1)
+        ];
       }
     });
   };
 
-  taskCounter = () => {
-    const filtered = this.state.todoData.filter(
-      (item) => item.checked === false,
-    );
+  const taskCounter = () => {
+    const filtered = todoData.filter((item) => item.checked === false);
     return filtered.length;
   };
 
-  deleteAllCompleted = () => {
-    this.setState(({ todoData }) => {
-      const completedTasks = todoData.filter((item) => item.checked === true);
-      const resArr = todoData.slice();
+  const deleteAllCompleted = () => {
+    setTodoData((prevState) => {
+      const completedTasks = prevState.filter((item) => item.checked === true);
+      const resArr = prevState.slice();
       for (const i of completedTasks) {
         const idx = resArr.findIndex((el) => el.label === i.label);
         resArr.splice(idx, 1);
       }
-      return {
-        todoData: resArr,
-      };
+      return resArr;
     });
   };
 
-  filteredTasks = () => {
-    const { todoData, filter } = this.state;
-    if (filter === 'All') return todoData;
-    if (filter === 'Active')
-      return todoData.filter((item) => item.checked === false);
-    if (filter === 'Completed')
-      return todoData.filter((item) => item.checked === true);
+  const filteredTasks = () => {
+    if (filter === "All") return todoData;
+    if (filter === "Active") return todoData.filter((item) => !item.checked);
+    if (filter === "Completed") return todoData.filter((item) => item.checked);
   };
 
-  onFilterChange = (filter) => {
-    this.setState({ filter });
+  const onFilterChange = (newFilter) => {
+    setFilter(newFilter);
   };
 
-  editingChange = (id, text) => {
-    this.setState(({ todoData }) => {
-      const idx = todoData.findIndex((el) => el.id === id);
-      return {
-        todoData: [
-          ...todoData.slice(0, idx),
-          { ...todoData[idx], editing: false, label: text },
-          ...todoData.slice(idx + 1),
-        ],
-      };
+  const editingChange = (id, text) => {
+    setTodoData((prevState) => {
+      const idx = prevState.findIndex((el) => el.id === id);
+      return [
+        ...prevState.slice(0, idx),
+        { ...prevState[idx], editing: false, label: text },
+        ...prevState.slice(idx + 1)
+      ];
     });
   };
 
-  render() {
-    const { filter } = this.state;
-
-    return (
+  return (
+    <Context.Provider
+      value={{
+        deleteItem,
+        checkItem,
+        editItem,
+        editingChange,
+        onFilterChange,
+        filter
+      }}
+    >
       <section className="todoapp">
         <header className="header">
           <h1>Todos</h1>
-          <NewTaskForm addItem={this.onItemAdded} />
+          <NewTaskForm addItem={onItemAdded} />
         </header>
         <section className="main">
-          <TaskList
-            todos={this.filteredTasks()}
-            onDeleted={this.deleteItem}
-            onChecked={this.checkItem}
-            onEditing={this.editItem}
-            editingChange={this.editingChange}
-          />
-          <Footer
-            counter={this.taskCounter}
-            deleteAll={this.deleteAllCompleted}
-            onFilterChange={this.onFilterChange}
-            filter={filter}
-          />
+          <TaskList todos={filteredTasks()} />
+          <Footer counter={taskCounter} deleteAll={deleteAllCompleted} />
         </section>
       </section>
-    );
-  }
+    </Context.Provider>
+  );
 }

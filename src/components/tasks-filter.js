@@ -1,10 +1,12 @@
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable react/function-component-definition */
 /* eslint-disable react/require-default-props */
-import React from "react";
-import PropTypes from "prop-types";
+import React, { useContext } from "react";
+import { Context } from "./context";
 
-const TasksFilter = ({ onFilterChange, filter }) => {
+const TasksFilter = () => {
+  const { filter, onFilterChange } = useContext(Context);
+
   const buttons = [
     { name: "All", label: "All" },
     { name: "Active", label: "Active" },
@@ -29,11 +31,6 @@ const TasksFilter = ({ onFilterChange, filter }) => {
   });
 
   return <ul className="filters">{elements}</ul>;
-};
-
-TasksFilter.propTypes = {
-  onFilterChange: PropTypes.func,
-  filter: PropTypes.string
 };
 
 export default TasksFilter;
