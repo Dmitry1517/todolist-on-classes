@@ -71,7 +71,7 @@ export default function Task({ labelText, id, date, checked, editing }) {
 }
 
 Task.propTypes = {
-  id: PropTypes.number,
+  id: PropTypes.string,
   labelText: PropTypes.string,
   checked: PropTypes.bool,
   editing: PropTypes.bool,

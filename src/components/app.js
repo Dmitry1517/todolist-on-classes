@@ -9,6 +9,7 @@
 /* eslint-disable import/extensions */
 /* eslint-disable import/no-unresolved */
 import React, { useState } from "react";
+import { v4 as uuidv4 } from "uuid";
 import NewTaskForm from "./new-task-form";
 import TaskList from "./task-list";
 import Footer from "./footer";
@@ -22,7 +23,7 @@ export default function App() {
 
   const onItemAdded = (text) => {
     const newItem = {
-      id: todoData.length + 1,
+      id: uuidv4(),
       label: text,
       checked: false,
       editing: false,
