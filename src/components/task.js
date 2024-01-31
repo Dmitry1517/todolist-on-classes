@@ -8,13 +8,59 @@
 /* eslint-disable import/no-unresolved */
 /* eslint-disable react/sort-comp */
 /* eslint-disable react/destructuring-assignment */
+/* eslint-disable react/self-closing-comp */
+/* eslint-disable class-methods-use-this */
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { formatDistanceToNow } from "date-fns";
 
 export default class Task extends Component {
   state = {
-    label: this.props.labelText
+    label: this.props.labelText,
+    second: 0,
+    timerWork: false
+  };
+
+  timer = null;
+
+  componentDidMount() {
+    if (this.state.timerWork) {
+      this.timer = setInterval(() => {
+        this.setState((prevState) => ({
+          second: prevState.second + 1
+        }));
+      }, 1000);
+    }
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.timer);
+  }
+
+  startTimer = () => {
+    if (!this.state.timerWork) {
+      this.setState({ timerWork: true });
+    }
+    this.timer = setInterval(() => {
+      this.setState((prevState) => ({
+        second: prevState.second + 1
+      }));
+    }, 1000);
+  };
+
+  stopTimer = () => {
+    if (this.state.timerWork) {
+      clearInterval(this.timer);
+      this.setState({
+        timerWork: false
+      });
+    }
+  };
+
+  renderTimer = (time) => {
+    const min = Math.floor(time / 60);
+    const sec = time % 60;
+    return `${min < 10 ? "0" : ""}${min} : ${sec < 10 ? "0" : ""}${sec}`;
   };
 
   onLabelChange = (event) => {
@@ -41,7 +87,7 @@ export default class Task extends Component {
       onChecked,
       onEditing
     } = this.props;
-    const { label } = this.state;
+    const { label, second } = this.state;
 
     let classNames = "";
     if (checked) classNames = "completed";
@@ -60,8 +106,21 @@ export default class Task extends Component {
             onChange={onChecked}
           />
           <label htmlFor={id}>
-            <span className="description">{labelText}</span>
-            <span className="created">created {result} ago</span>
+            <span className="title">{labelText}</span>
+            <span className="description">
+              <button
+                type="button"
+                className="icon icon-play"
+                onClick={this.startTimer}
+              ></button>
+              <button
+                type="button"
+                className="icon icon-pause"
+                onClick={this.stopTimer}
+              ></button>
+              <span style={{ marginLeft: 7 }}>{this.renderTimer(second)}</span>
+            </span>
+            <span className="description">created {result} ago</span>
           </label>
           <button
             type="button"
